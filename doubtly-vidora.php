@@ -3,7 +3,7 @@
  * Plugin Name: Doubtly Vidora
  * Plugin URI: https://github.com/ajinkgupta/doubtly-vidora
  * Description: A WordPress plugin for managing video content with custom post type and widget.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Ajink Gupta
  * Author URI: https://github.com/ajinkgupta
  * License: GPL-2.0+
@@ -217,3 +217,24 @@ function doubtly_vidora_load_templates($template) {
     return $template;
 }
 add_filter('template_include', 'doubtly_vidora_load_templates');
+
+// Add rewrite rules
+function doubtly_vidora_rewrite_rules() {
+    add_rewrite_rule('^videos/?$', 'index.php?post_type=dv_video', 'top');
+    add_rewrite_rule('^video/([^/]+)/?$', 'index.php?post_type=dv_video&name=$matches[1]', 'top');
+}
+add_action('init', 'doubtly_vidora_rewrite_rules', 10, 0);
+
+// Flush rewrite rules on plugin activation
+function doubtly_vidora_activate() {
+    doubtly_vidora_register_cpt();
+    doubtly_vidora_rewrite_rules();
+    flush_rewrite_rules();
+}
+register_activation_hook(__FILE__, 'doubtly_vidora_activate');
+
+// Flush rewrite rules on plugin deactivation
+function doubtly_vidora_deactivate() {
+    flush_rewrite_rules();
+}
+register_deactivation_hook(__FILE__, 'doubtly_vidora_deactivate');
